@@ -5,8 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from .. import database, oauth2, schemas
-from ..config import settings
+from .. import config, database, oauth2, schemas
 
 router = APIRouter(prefix="/login", tags=["Authentication"])
 
@@ -24,7 +23,9 @@ def login(user_credentials: UserCredentials, db: DbSession):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid Credentials",
         )
-    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token_expires = timedelta(
+        minutes=config.settings.access_token_expire_minutes
+    )
     access_token = oauth2.create_access_token(
         {"sub": user.email}, expires_delta=access_token_expires
     )

@@ -3,12 +3,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from .. import models, oauth2, schemas
-from ..database import get_db
+from .. import database, models, oauth2, schemas
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-DbSession = Annotated[Session, Depends(get_db)]
+DbSession = Annotated[Session, Depends(database.get_db)]
 
 
 @router.post(

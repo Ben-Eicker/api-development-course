@@ -4,12 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from .. import models, oauth2, schemas
-from ..database import get_db
+from .. import database, models, oauth2, schemas
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
-DbSession = Annotated[Session, Depends(get_db)]
+DbSession = Annotated[Session, Depends(database.get_db)]
 User = Annotated[schemas.UserResponse, Depends(oauth2.get_current_user)]
 
 

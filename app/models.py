@@ -1,10 +1,10 @@
 from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, Integer, String, text
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from . import database
 
 
-class Post(Base):
+class Post(database.Base):
     __tablename__ = "posts"
 
     post_id = Column(Integer, autoincrement=True, nullable=False, primary_key=True)
@@ -20,7 +20,7 @@ class Post(Base):
     user = relationship("User")
 
 
-class User(Base):
+class User(database.Base):
     __tablename__ = "users"
 
     user_id = Column(Integer, autoincrement=True, nullable=False, primary_key=True)
@@ -31,7 +31,7 @@ class User(Base):
     )
 
 
-class Vote(Base):
+class Vote(database.Base):
     __tablename__ = "votes"
     post_id = Column(
         Integer, ForeignKey("posts.post_id", ondelete="cascade"), primary_key=True
