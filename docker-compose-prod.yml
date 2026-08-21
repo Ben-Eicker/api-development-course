@@ -1,0 +1,33 @@
+services:
+  api:
+    image: eickerben/api-development-course
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - 80:8000
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    environment:
+      - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+volumes:
+  postgres-db:

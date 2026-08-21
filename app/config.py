@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
 
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property
     def database_url(self) -> str:
