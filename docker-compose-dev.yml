@@ -11,10 +11,15 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     env_file:
       - ./.env
+    environment:
+      - DATABASE_HOSTNAME=postgres
+      - DATABASE_PORT=5432
   postgres:
     image: postgres:16
     env_file:
       - ./.env
+    ports:
+      - 5433:5432
     volumes:
       - postgres-db:/var/lib/postgresql/data
     healthcheck:
