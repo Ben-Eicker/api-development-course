@@ -36,17 +36,65 @@ app/
     ├── user.py        # /users endpoints
     ├── auth.py        # /login endpoint
     └── vote.py         # /vote endpoints
-alembic/               # Database migration scripts
+alembic/                # Database migration scripts
+Dockerfile              # API container image
+docker-compose-dev.yml  # Local dev stack (API + Postgres, live reload)
+docker-compose-prod.yml # Production stack (pre-built image, no bind mounts)
 ```
 
 ## Setup
 
-### 1. Prerequisites
+There are two ways to run this project: with Docker (recommended, no local Postgres install needed) or fully locally.
+
+### Option A: Docker
+
+**1. Configure environment variables**
+
+Create a `.env` file in the project root:
+
+```env
+DATABASE_HOSTNAME=localhost
+DATABASE_PORT=5433
+DATABASE_NAME=api_development_course
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=<your-db-password>
+SECRET_KEY=<a-random-secret-key>
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=<same-as-DATABASE_PASSWORD>
+POSTGRES_DB=api_development_course
+```
+
+`.env` is gitignored — never commit real credentials. The Postgres container's host port is mapped to `5433` (not the default `5432`) to avoid clashing with a locally installed PostgreSQL service, if you have one.
+
+**2. Start the containers**
+
+```bash
+docker compose -f docker-compose-dev.yml up --build
+```
+
+This builds the API image, starts Postgres, and runs `uvicorn` with `--reload` (code changes on your machine are picked up live via a bind mount).
+
+**3. Run database migrations**
+
+```bash
+alembic upgrade head
+```
+
+Migrations run from your host machine against the containerized Postgres via the `5433` port mapping above.
+
+The API is now available at `http://127.0.0.1:8000`, with interactive docs at `http://127.0.0.1:8000/docs`.
+
+### Option B: Local (no Docker)
+
+**1. Prerequisites**
 
 - Python 3.13+
 - A running PostgreSQL instance
 
-### 2. Install dependencies
+**2. Install dependencies**
 
 ```bash
 python -m venv .venv
@@ -54,36 +102,21 @@ source .venv/Scripts/activate   # Windows Git Bash
 pip install -r requirements.txt
 ```
 
-### 3. Configure environment variables
+**3. Configure environment variables**
 
-Create a `.env` file in the project root:
+Same as above, but set `DATABASE_PORT=5432` (or whatever port your local Postgres actually listens on) and `DATABASE_HOSTNAME=localhost`.
 
-```env
-DATABASE_HOSTNAME=localhost
-DATABASE_PORT=5432
-DATABASE_NAME=api_development_course
-DATABASE_USERNAME=postgres
-DATABASE_PASSWORD=<your-db-password>
-SECRET_KEY=<a-random-secret-key>
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-```
-
-`.env` is gitignored — never commit real credentials.
-
-### 4. Run database migrations
+**4. Run database migrations**
 
 ```bash
 alembic upgrade head
 ```
 
-### 5. Start the server
+**5. Start the server**
 
 ```bash
 uvicorn app.main:app --reload
 ```
-
-The API will be available at `http://127.0.0.1:8000`, with interactive docs at `http://127.0.0.1:8000/docs`.
 
 ## API overview
 
@@ -91,7 +124,7 @@ The API will be available at `http://127.0.0.1:8000`, with interactive docs at `
 |---|---|---|---|
 | POST | `/users/` | Register a new user | No |
 | GET | `/users/{id}` | Get a user by id | No |
-| POST | `/login` | Log in, receive a JWT | No |
+| POST | `/login/` | Log in, receive a JWT | No |
 | GET | `/posts/` | List posts (supports `search`, `limit`, `skip`) | Yes |
 | GET | `/posts/{id}` | Get a single post | Yes |
 | POST | `/posts/` | Create a post | Yes |
