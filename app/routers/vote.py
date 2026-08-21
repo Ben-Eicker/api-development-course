@@ -17,7 +17,7 @@ def vote(vote: schemas.VoteBase, db: DbSession, user: User):
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"post with id: {id} does not exist",
+            detail=f"post with id: {vote.post_id} does not exist",
         )
     vote_query = db.query(models.Vote).filter(
         models.Vote.post_id == vote.post_id, models.Vote.user_id == user.user_id

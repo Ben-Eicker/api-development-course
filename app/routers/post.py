@@ -87,8 +87,7 @@ def delete_post(id: int, db: DbSession, user: User):
 @router.put("/{id}", response_model=schemas.PostResponse)
 def update_post(id: int, updated_post: schemas.PostCreate, db: DbSession, user: User):
     """Update a post by id."""
-    post_query = db.query(models.Post).filter(models.Post.post_id == id)
-    post = post_query.first()
+    post = db.query(models.Post).filter(models.Post.post_id == id).first()
     if post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -99,6 +98,8 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: DbSession, user: 
             status_code=status.HTTP_403_FORBIDDEN,
             detail="not authorized to perform requested action",
         )
-    post_query.update(updated_post.model_dump(), synchronize_session=False)  # pyright: ignore
+    for field, value in updated_post.model_dump().items():
+        setattr(post, field, value)
     db.commit()
-    return post_query.first()
+    db.refresh(post)
+    return post
