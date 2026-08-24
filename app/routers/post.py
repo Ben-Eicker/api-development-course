@@ -13,9 +13,7 @@ User = Annotated[schemas.UserResponse, Depends(oauth2.get_current_user)]
 
 
 @router.get("/", response_model=list[schemas.PostResponse])
-def get_posts(
-    db: DbSession, user: User, limit: int = 10, skip: int = 0, search: str = ""
-):
+def get_posts(db: DbSession, user: User, limit: int = 10, skip: int = 0, search: str = ""):
     """Retrieve all posts with their vote counts."""
     results = (
         db.query(models.Post, func.count(models.Vote.post_id).label("votes"))
@@ -52,9 +50,7 @@ def get_post(id: int, db: DbSession, user: User):
     return schemas.PostResponse.model_validate(post).model_copy(update={"votes": votes})
 
 
-@router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse
-)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
 def create_posts(post: schemas.PostCreate, db: DbSession, user: User):
     """Create a new post."""
     new_post = models.Post(**post.model_dump(), user_id=user.user_id)

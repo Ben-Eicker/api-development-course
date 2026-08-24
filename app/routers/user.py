@@ -10,9 +10,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 DbSession = Annotated[Session, Depends(database.get_db)]
 
 
-@router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse
-)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse)
 def create_user(user: schemas.UserCreate, db: DbSession):
     """Create a new user."""
     existing_user = db.query(models.User).filter(models.User.email == user.email).first()

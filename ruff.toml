@@ -1,0 +1,14 @@
+line-length = 99
+target-version = "py313"
+
+[format]
+docstring-code-format = true
+
+[lint]
+select = ["E", "F", "I", "D"]
+# D1xx = "missing docstring" - not enforced; docstrings are opt-in, not required.
+# D203/D213 conflict with D211/D212 (blank-line-before-class-docstring style); using D211/D212.
+ignore = ["D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", "D203", "D213"]
+
+[lint.pydocstyle]
+convention = "pep257"

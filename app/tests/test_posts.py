@@ -42,9 +42,7 @@ def test_create_post(authorized_client, test_user):
 
 
 def test_create_post_unauthenticated(client):
-    response = client.post(
-        "/posts/", json={"title": "new title", "content": "new content"}
-    )
+    response = client.post("/posts/", json={"title": "new title", "content": "new content"})
     assert response.status_code == 401
 
 
