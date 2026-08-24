@@ -87,8 +87,8 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DbSessio
     :param db:
         Database session
     :raises HTTPException:
-        401 if the token is missing, invalid, expired, or names a
-        user that no longer exists
+        401 if the token is missing, invalid, expired, or names a user
+        that no longer exists
     :return:
         The authenticated user
     """

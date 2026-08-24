@@ -20,8 +20,8 @@ def vote(vote: schemas.VoteBase, db: DbSession, user: User):
     :param db:
         Database session
     :raises HTTPException:
-        If the post does not exist, the vote already exists (409),
-        or the vote to remove does not exist (404)
+        If the post does not exist, the vote already exists (409), or
+        the vote to remove does not exist (404)
     :return:
         Confirmation message describing the action taken
     """
