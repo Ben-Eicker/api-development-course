@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -13,7 +13,13 @@ User = Annotated[schemas.UserResponse, Depends(oauth2.get_current_user)]
 
 
 @router.get("/", response_model=list[schemas.PostResponse])
-def get_posts(db: DbSession, user: User, limit: int = 10, skip: int = 0, search: str = ""):
+def get_posts(
+    db: DbSession,
+    user: User,
+    limit: int = Query(10, ge=1, le=100),
+    skip: int = Query(0, ge=0),
+    search: str = "",
+):
     """Retrieve all posts with their vote counts."""
     results = (
         db.query(models.Post, func.count(models.Vote.post_id).label("votes"))
