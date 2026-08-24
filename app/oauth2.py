@@ -30,10 +30,12 @@ def get_password_hash(password: str):
 def get_user(username: str, db: DbSession):
     """Look up a user by email.
 
-    :param username: The user's email address, despite the parameter
-        name
-    :param db: Database session
-    :return: The matching user, or None if no user has that email
+    :param username:
+        The user's email address, despite the parameter name
+    :param db:
+        Database session
+    :return:
+        The matching user, or None if no user has that email
     """
     user = db.query(models.User).filter(models.User.email == username).first()
     return user
@@ -58,10 +60,12 @@ def authenticate_user(username: str, password: str, db: DbSession):
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     """Encode a JWT access token.
 
-    :param data: Claims to embed in the token, e.g. {"sub": user.email}
-    :param expires_delta: Time until expiry; defaults to 15 minutes if
-        not given
-    :return: The encoded JWT
+    :param data:
+        Claims to embed in the token, e.g. {"sub": user.email}
+    :param expires_delta:
+        Time until expiry; defaults to 15 minutes if not given
+    :return:
+        The encoded JWT
     """
     to_encode = data.copy()
     if expires_delta:
@@ -78,11 +82,15 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: DbSessio
 
     Used as a FastAPI dependency to authenticate requests.
 
-    :param token: JWT bearer token from the Authorization header
-    :param db: Database session
-    :raises HTTPException: 401 if the token is missing, invalid,
-        expired, or names a user that no longer exists
-    :return: The authenticated user
+    :param token:
+        JWT bearer token from the Authorization header
+    :param db:
+        Database session
+    :raises HTTPException:
+        401 if the token is missing, invalid, expired, or names a
+        user that no longer exists
+    :return:
+        The authenticated user
     """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

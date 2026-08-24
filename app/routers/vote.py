@@ -15,12 +15,15 @@ User = Annotated[schemas.UserResponse, Depends(oauth2.get_current_user)]
 def vote(vote: schemas.VoteBase, db: DbSession, user: User):
     """Cast or retract the current user's vote on a post.
 
-    :param vote: Post id and direction (1 to upvote, 0 to remove the
-        vote)
-    :param db: Database session
-    :raises HTTPException: If the post does not exist, the vote already
-        exists (409), or the vote to remove does not exist (404)
-    :return: Confirmation message describing the action taken
+    :param vote:
+        Post id and direction (1 to upvote, 0 to remove the vote)
+    :param db:
+        Database session
+    :raises HTTPException:
+        If the post does not exist, the vote already exists (409),
+        or the vote to remove does not exist (404)
+    :return:
+        Confirmation message describing the action taken
     """
     post = db.query(models.Post).filter(models.Post.post_id == vote.post_id).first()
     if not post:
