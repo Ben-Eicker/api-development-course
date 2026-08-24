@@ -1,5 +1,7 @@
 # API Development Course
 
+[![Build and Deploy](https://github.com/Ben-Eicker/api-development-course/actions/workflows/build-deploy.yml/badge.svg)](https://github.com/Ben-Eicker/api-development-course/actions/workflows/build-deploy.yml)
+
 A REST API built with **FastAPI**, **SQLAlchemy**, and **PostgreSQL**, covering posts, user accounts, JWT authentication, and post voting.
 
 ## Features
@@ -20,6 +22,9 @@ A REST API built with **FastAPI**, **SQLAlchemy**, and **PostgreSQL**, covering 
 - [PostgreSQL](https://www.postgresql.org/) – database
 - [Pydantic](https://docs.pydantic.dev/) / [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) – request/response schemas and config
 - [PyJWT](https://pyjwt.readthedocs.io/) + [pwdlib](https://frankie567.github.io/pwdlib/) – authentication and password hashing
+- [Docker](https://www.docker.com/) – containerization
+- [GitHub Actions](https://github.com/features/actions) – CI (lint + test) and image publishing
+- [Ruff](https://docs.astral.sh/ruff/) – linting and formatting
 
 ## Project structure
 
@@ -37,9 +42,13 @@ app/
     ├── auth.py        # /login endpoint
     └── vote.py         # /vote endpoints
 alembic/                # Database migration scripts
+.github/workflows/      # CI/CD pipeline (lint, test, build, publish)
 Dockerfile              # API container image
 docker-compose-dev.yml  # Local dev stack (API + Postgres, live reload)
 docker-compose-prod.yml # Production stack (pre-built image, no bind mounts)
+requirements.txt        # Runtime dependencies (what Dockerfile installs)
+requirements-dev.txt     # + test/lint tooling, for local dev and CI
+ruff.toml               # Lint/format configuration
 ```
 
 ## Setup
@@ -155,3 +164,26 @@ pytest
 ```
 
 Tests run against a separate `_test`-suffixed database (see `app/tests/conftest.py`) and expect Postgres to be reachable — start it via `docker compose -f docker-compose-dev.yml up -d` first if it isn't running.
+
+## CI/CD
+
+Defined in `.github/workflows/build-deploy.yml`, two jobs:
+
+1. **Lint & Test** — runs on every push and pull request targeting `main`. Spins up a throwaway Postgres service container, installs `requirements-dev.txt`, runs `ruff check .`, then `pytest`.
+2. **Build & Push Docker Image** — runs only after Lint & Test passes, and only on a direct push to `main` (not on PRs). Builds the image from `Dockerfile` and pushes it to Docker Hub, tagged both `:latest` and with the commit SHA.
+
+There is no automated deploy step — the pipeline stops at publishing the image to Docker Hub, since this project doesn't run on a live server.
+
+To run this pipeline on your own fork, configure these under **Settings → Secrets and variables → Actions**:
+
+**Secrets:**
+- `DATABASE_PASSWORD`
+- `SECRET_KEY`
+- `DOCKERHUB_TOKEN` (a Docker Hub access token, not your account password)
+
+**Variables:**
+- `DATABASE_NAME`
+- `DATABASE_USERNAME`
+- `ALGORITHM`
+- `ACCESS_TOKEN_EXPIRE_MINUTES`
+- `DOCKERHUB_USERNAME`
