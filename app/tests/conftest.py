@@ -15,7 +15,7 @@ TestingSessionLocal = sessionmaker(
 
 @pytest.fixture
 def session():
-    """Provide a fresh test-database session, recreating all tables first."""
+    """Provide a fresh, recreated test-database session."""
     database.Base.metadata.drop_all(bind=engine)
     database.Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
@@ -41,7 +41,7 @@ def client(session):
 
 @pytest.fixture
 def test_user(client):
-    """Create a user via the API and return the response data plus its plaintext password."""
+    """Create a user via the API, returning data plus its password."""
     user_data = {"email": "max.mustermann@gmail.com", "password": "musterpassword"}
     response = client.post("/users/", json=user_data)
     assert response.status_code == 201
@@ -52,7 +52,7 @@ def test_user(client):
 
 @pytest.fixture
 def test_user2(client):
-    """Create a second user via the API, for tests involving another account."""
+    """Create a second user via the API (for multi-user tests)."""
     user_data = {"email": "erika.musterfrau@gmail.com", "password": "otherpassword"}
     response = client.post("/users/", json=user_data)
     assert response.status_code == 201
@@ -69,7 +69,7 @@ def test_token(test_user):
 
 @pytest.fixture
 def authorized_client(client, test_token):
-    """Provide a TestClient that sends test_user's bearer token on every request."""
+    """Provide a TestClient that sends test_user's bearer token."""
     client.headers = {
         **client.headers,
         "Authorization": f"Bearer {test_token}",
