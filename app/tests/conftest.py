@@ -15,6 +15,7 @@ TestingSessionLocal = sessionmaker(
 
 @pytest.fixture
 def session():
+    """Provide a fresh test-database session, recreating all tables first."""
     database.Base.metadata.drop_all(bind=engine)
     database.Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
@@ -26,6 +27,8 @@ def session():
 
 @pytest.fixture
 def client(session):
+    """Provide a TestClient wired to use the test database session."""
+
     def override_get_db():
         try:
             yield session
@@ -38,6 +41,7 @@ def client(session):
 
 @pytest.fixture
 def test_user(client):
+    """Create a user via the API and return the response data plus its plaintext password."""
     user_data = {"email": "max.mustermann@gmail.com", "password": "musterpassword"}
     response = client.post("/users/", json=user_data)
     assert response.status_code == 201
@@ -48,6 +52,7 @@ def test_user(client):
 
 @pytest.fixture
 def test_user2(client):
+    """Create a second user via the API, for tests involving another account."""
     user_data = {"email": "erika.musterfrau@gmail.com", "password": "otherpassword"}
     response = client.post("/users/", json=user_data)
     assert response.status_code == 201
@@ -58,11 +63,13 @@ def test_user2(client):
 
 @pytest.fixture
 def test_token(test_user):
+    """Create a valid access token for test_user."""
     return oauth2.create_access_token({"sub": test_user["email"]})
 
 
 @pytest.fixture
 def authorized_client(client, test_token):
+    """Provide a TestClient that sends test_user's bearer token on every request."""
     client.headers = {
         **client.headers,
         "Authorization": f"Bearer {test_token}",
@@ -72,6 +79,7 @@ def authorized_client(client, test_token):
 
 @pytest.fixture
 def test_posts(test_user, session):
+    """Seed three posts owned by test_user directly in the database."""
     posts_data = [
         {
             "title": "first title",
