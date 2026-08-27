@@ -4,6 +4,8 @@
 
 A REST API built with **FastAPI**, **SQLAlchemy**, and **PostgreSQL**, covering posts, user accounts, JWT authentication, and post voting.
 
+A companion Streamlit frontend for this API lives in a separate repo: [frontend-development-course](https://github.com/Ben-Eicker/frontend-development-course). It's fully decoupled — it only talks to this API over HTTP — so the two are developed, versioned, and deployed independently. See that repo's README for setup.
+
 ## Features
 
 - CRUD operations on posts (title, content, published flag)
